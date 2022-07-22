@@ -34,6 +34,10 @@ Author: Garrett Holmes
     - Can either run the training cell to train the model (not recommended if not on GPU) or just the cell that tests the network on the test dataset
         - You can test without training and get good results if you load the .pth file (`DOWNLOAD_WEIGHTS=False`)
     - Final cell creates a window that will display all the incorrect predictions from the last test run
+- 'graph.py':
+    - Creates a visualization of the loss & accuracy over the course of training
+        - Must provide a filename the bottom of the file
+        - Make sure the `model_name` variable is the same as the name in the log file
 
 ### Using the 'Trainer' class (See 'resnet.py' as an example)
 - Initialize:
