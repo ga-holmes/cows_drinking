@@ -28,7 +28,7 @@ Author: Garrett Holmes
 - 'resnet.ipynb':
     - Loads one of 2 ResNet models from PyTorch - both ResNet50 & ResNet18 work & can be specified in the first cell
     - `DOWNLOAD_WEIGHTS` specifies whether or not to simply load pretrained weights (`True`) or load weights from a file (`False`)
-        - The 'ResNet50_weights.pth' file is provided & will load weights trained on a dataset made from only 1 video of pen 101, and will only work on ResNet50
+        - The 'resnet18_weights_alldata.pth' file is provided & will load weights trained on a dataset made from only videos with 1 visible pen, and will only work on ResNet18
     - Loads the dataset from the given '.npy' file
     - Loads the model & creates a Trainer class
     - Can either run the training cell to train the model (not recommended if not on GPU) or just the cell that tests the network on the test dataset

@@ -4,4 +4,4 @@
 *.xlsx
 videos
 videoFrame.py
-!resnet50_weights.pth
+!resnet18_weights_alldata.pth
