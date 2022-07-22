@@ -17,14 +17,14 @@ def create_acc_loss_graph(model_name, file_name):
     val_losses = []
 
     # iterate through all the lines in the file
-    for c in contents:
+    for i, c in enumerate(contents):
         # make sure the line is of the right model name
         if model_name in c:
             # get the values in each line (c) seperated by comma
             name, timestamp, acc, loss, val_acc, val_loss = c.split(',')
 
             # add them to the list
-            times.append(float(timestamp))
+            times.append(float(i))
             accuracies.append(float(acc))
             losses.append(float(loss))
             
