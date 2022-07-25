@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from matplotlib import style
 style.use('ggplot')
 
-model_name = 'resnet18_alldata_finetuned'
+model_name = 'resnet18_alldata_scheduled_3e10bs'
 
 # graphs the accuracy and loss of the model
 def create_acc_loss_graph(model_name, file_name):
@@ -49,4 +49,4 @@ def create_acc_loss_graph(model_name, file_name):
     plt.show()
 
     
-create_acc_loss_graph(model_name, file_name='resnet18_alldata_finetuned.log')
+create_acc_loss_graph(model_name, file_name=f'{model_name}.log')

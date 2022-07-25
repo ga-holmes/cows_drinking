@@ -19,7 +19,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from zmq import device
 
 # model functions:
 
@@ -33,13 +32,14 @@ class Trainer():
     EPOCHS = 5
     device = 'cpu'
 
-    def __init__(self, model, im_size, modelname, device='cpu', optimizer=optim.SGD, im_chan=3):
+    def __init__(self, model, im_size, modelname, device='cpu', optimizer=optim.SGD, im_chan=3, scheduler=None):
         self.model = model
         self.optimizer = optimizer(self.model.fc.parameters(), lr=self.learning_rate)
         self.device = device
         self.im_size = im_size
         self.im_chan = im_chan
         self.modelname = modelname
+        self.scheduler = scheduler
 
     # function to take data & put it through the model, if train=True, update the parameters as well
     def fwd_pass(self, X, y, train=False):
@@ -99,6 +99,10 @@ class Trainer():
                         val_acc, val_loss, bad_results, bad_labels = self.test(test_X, test_y, size=100)
                         # write the model name, the time, the accuracy, & the loss to the model.log file
                         f.write(f"{self.modelname},{round(time.time(), 3)}, {round(float(acc), 2)}, {round(float(loss), 4)}, {round(float(val_acc), 2)}, {round(float(val_loss), 4)}\n")
+                        
+                # step the learning rate if not none
+                if self.scheduler is not None:
+                    self.scheduler.step()
 
 
     # tests some data (default 32 pieces of data)
