@@ -32,6 +32,8 @@ class Trainer():
     EPOCHS = 5
     device = 'cpu'
 
+    log_dir = ''
+
     def __init__(self, model, im_size, modelname, device='cpu', optimizer=optim.SGD, im_chan=3, scheduler=None):
         self.model = model
         self.optimizer = optimizer(self.model.fc.parameters(), lr=self.learning_rate)
@@ -83,9 +85,11 @@ class Trainer():
     # if validate is true, test_X & test_y must be defined
     def train(self, train_X, train_y, validate=False, val_steps=50, test_X=[], test_y=[]):
 
-        with open(f"{self.modelname}.log", "a") as f:
+        with open(os.path.join(self.log_dir, f"{self.modelname}.log"), "a") as f:
+
             for epoch in range(self.EPOCHS):
                 for i in tqdm(range(0, len(train_X), self.BATCH_SIZE)):
+
                     # put the batches through the network (sliced based on batch size)
                     batch_X = train_X[i:i+self.BATCH_SIZE].view(-1, self.im_chan, self.im_size, self.im_size).to(self.device)
                     batch_y = train_y[i:i+self.BATCH_SIZE].to(self.device)
@@ -98,7 +102,7 @@ class Trainer():
                         
                         val_acc, val_loss, bad_results, bad_labels = self.test(test_X, test_y, size=100)
                         # write the model name, the time, the accuracy, & the loss to the model.log file
-                        f.write(f"{self.modelname},{round(time.time(), 3)}, {round(float(acc), 2)}, {round(float(loss), 4)}, {round(float(val_acc), 2)}, {round(float(val_loss), 4)}\n")
+                        f.write(f"{self.modelname},{round(time.time(), 3)}, {round(float(acc), 2)}, {round(float(loss), 4)}, {round(float(val_acc), 2)}, {round(float(val_loss), 4)}, {epoch}\n")
                         
                 # step the learning rate if not none
                 if self.scheduler is not None:

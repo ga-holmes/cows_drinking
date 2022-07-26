@@ -5,3 +5,4 @@
 videos
 videoFrame.py
 !resnet18_weights_alldata.pth
+!resnet18_alldata.log
