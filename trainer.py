@@ -30,14 +30,14 @@ class Trainer():
     # if there is a memory error, lower the batch size (you want a batch size of at least 8 however)
     BATCH_SIZE = 100
     EPOCHS = 5
-    device = 'cpu'
+    device_to_use = 'cpu'
 
     log_dir = ''
 
-    def __init__(self, model, im_size, modelname, device='cpu', optimizer=optim.SGD, im_chan=3, scheduler=None):
+    def __init__(self, model, im_size, modelname, device_to_use='cpu', optimizer=optim.SGD, im_chan=3, scheduler=None):
         self.model = model
         self.optimizer = optimizer(self.model.fc.parameters(), lr=self.learning_rate)
-        self.device = device
+        self.device_to_use = device_to_use
         self.im_size = im_size
         self.im_chan = im_chan
         self.modelname = modelname
@@ -91,8 +91,8 @@ class Trainer():
                 for i in tqdm(range(0, len(train_X), self.BATCH_SIZE)):
 
                     # put the batches through the network (sliced based on batch size)
-                    batch_X = train_X[i:i+self.BATCH_SIZE].view(-1, self.im_chan, self.im_size, self.im_size).to(self.device)
-                    batch_y = train_y[i:i+self.BATCH_SIZE].to(self.device)
+                    batch_X = train_X[i:i+self.BATCH_SIZE].view(-1, self.im_chan, self.im_size, self.im_size).to(self.device_to_use)
+                    batch_y = train_y[i:i+self.BATCH_SIZE].to(self.device_to_use)
 
                     # do a forward pass with training on to get accuracy & loss
                     acc, loss, bad_results, bad_labels = self.fwd_pass(batch_X, batch_y, train=True)
@@ -118,6 +118,6 @@ class Trainer():
         X, y = test_X[random_start:random_start+size], test_y[random_start:random_start+size]
 
         with torch.no_grad():
-            val_acc, val_loss, bad_results, bad_labels = self.fwd_pass(X.view(-1, self.im_chan, self.im_size, self.im_size).to(self.device),y.to(self.device), train=False)
+            val_acc, val_loss, bad_results, bad_labels = self.fwd_pass(X.view(-1, self.im_chan, self.im_size, self.im_size).to(self.device_to_use),y.to(self.device_to_use), train=False)
 
         return val_acc, val_loss, bad_results, bad_labels

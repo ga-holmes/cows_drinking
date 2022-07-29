@@ -8,9 +8,15 @@ Author: Garrett Holmes
 - Uses PyTorch for CNNs & OpenCV for initially processing the data into numpy format. ImgAug for augmentations.
 - Install all requirements using directions below
 
-### Installation:
+### Installation:(must have python/pip 3.7+ installed already)
 - With Conda: `conda create --name <env> --file requirements.txt`
-- With Pip (must have python/pip installed already): `pip install -r requirements.txt`
+- With Pip: `pip install -r requirements.txt`
+
+- Must Install Pytorch Seperately: 
+    - go to https://pytorch.org/ & navigate to install table
+    - Choose the appropriate PyTorch build for your system (whether you want CUDA, etc.)
+    - ex. conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
+
 ---
 ## Usage:
 ### Files:
