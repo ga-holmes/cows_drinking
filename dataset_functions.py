@@ -1,5 +1,6 @@
 import json
 import os
+from random import shuffle
 from statistics import mode
 import cv2
 import numpy as np
@@ -30,6 +31,7 @@ class CowsWater():
     IMG_SIZE = 512
     # specify whether to convert to grayscale
     GRAYSCALE = True
+    SHUFFLE = True
     SAVE_NAME = 'training_all.npy'
 
     # directory locations
@@ -46,11 +48,12 @@ class CowsWater():
     empty_count = 0
     cow_count = 0
 
-    def __init__(self, input_path, label_path, grayscale=True, img_size=512):
+    def __init__(self, input_path, label_path, grayscale=True, shuffle=True, img_size=512):
         
         self.VIDEOS = input_path
         self.LABEL_PATH = label_path
         self.GRAYSCALE = grayscale
+        self.SHUFFLE = shuffle
         self.IMG_SIZE = img_size
 
     # creates a training data file in the format (list) [(np.array - the image), (a one-hot vector containing the label for the image)]
@@ -196,7 +199,8 @@ class CowsWater():
                 cap.release()   
 
         # shuffle the dataset
-        np.random.shuffle(self.training_data)
+        if self.SHUFFLE:
+            np.random.shuffle(self.training_data)
         
         # save the training data
         np.save(self.SAVE_NAME, self.training_data)
@@ -211,7 +215,7 @@ class CowsWater():
 # NOTE: Data is expected in the following format:
 # A .npy file containing a list of numpy arrays representing images, along with corresponding labels in one-hot vector format
 # Generally, follow the format that the CowsWater class saves the data in
-def load_split_data(filename, preprocessing=iaa.Sequential, validation_percent=0.1):
+def load_split_data(filename, preprocessing=None, validation_percent=0.1):
     # load from file
     training_data = np.load(filename, allow_pickle=True)
 
@@ -223,7 +227,8 @@ def load_split_data(filename, preprocessing=iaa.Sequential, validation_percent=0
         # convert colours to rgb if they are in grayscale (pre-trained models only accept 3-channel images)
         im = cv2.cvtColor(i[0], cv2.COLOR_GRAY2RGB) if len(i[0].shape) < 3 else i[0]
         # apply the image transforms (one image at a time to save memory)
-        im = preprocessing(image=im)
+        if preprocessing is not None:
+            im = preprocessing(image=im)
 
         X.append(im)
 
