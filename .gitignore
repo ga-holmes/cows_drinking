@@ -3,6 +3,10 @@
 *.log
 *.xlsx
 videos
+videos_2
+clips
 videoFrame.py
 !resnet18_weights_alldata.pth
 !resnet18_alldata.log
+test.jpg
+Untitled.mp4
