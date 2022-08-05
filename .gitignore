@@ -5,8 +5,6 @@
 videos
 videos_2
 clips
-videoFrame.py
+test_clips
 !resnet18_weights_alldata.pth
 !resnet18_alldata.log
-test.jpg
-Untitled.mp4

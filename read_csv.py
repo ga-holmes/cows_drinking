@@ -82,8 +82,8 @@ def get_rec_codes(lines=list):
                 'IGNORE': []
             }
 
-            for i in l[6].split('/'):
-                if len(l[6]) > 0:
+            for i in l[5].split('/'):
+                if len(l[5]) > 0:
                     struct['IGNORE'].append(i.split('-'))
 
             videos.append(struct)

@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from matplotlib import style
 style.use('ggplot')
 
-model_name = 'resnet50_alldata_scheduled_10e128bsMSE_Adam'
+model_name = 'resnet18_colour_local_scheduled_10e128bsMSE_Adam'
 
 # graphs the accuracy and loss of the model
 def create_acc_loss_graph(model_name, file_name):

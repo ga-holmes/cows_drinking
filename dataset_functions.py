@@ -105,6 +105,10 @@ class CowsWater():
 
                     path = os.path.join(self.VIDEOS, date, pen, f)
 
+                    # ignore files that arent videos
+                    if f.split('.')[1].upper() != 'MP4':
+                        continue
+
                     # time regions to ignore (bad data)
                     ignore = []
                     for t in files[0]['VIDEO']['IGNORE']:
@@ -196,7 +200,7 @@ class CowsWater():
                                 # img is converted to a numpy array, the second parameter is the class label (in this case we make a 1-hot vector)
                                 self.training_data.append([np.array(img), vec])
                 
-                cap.release()   
+                    cap.release()   
 
         # shuffle the dataset
         if self.SHUFFLE:
