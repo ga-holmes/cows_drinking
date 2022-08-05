@@ -24,6 +24,11 @@ from zmq import device
 
 # dataset functions:
 
+def get_video_time(frame_num, fps):
+    
+    curr_time =  dt.datetime.strptime(f'{int(((frame_num/fps)/60)/60):02d}:{int(((frame_num/fps)/60)%60):02d}:{int((frame_num / fps)%60):02d}', '%H:%M:%S').time()
+
+    return curr_time
 
 # define a class for the dataset
 class CowsWater():

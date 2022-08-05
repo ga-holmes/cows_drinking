@@ -2,9 +2,12 @@ import cv2
 import matplotlib.pyplot as plt
 
 from trainer import *
+from dataset_functions import get_video_time
 
 import torch
 from torchvision.models import resnet50, resnet18, resnext50_32x4d
+
+import time
 
 WEIGHT_FILE = 'weights/resnet18_colour_local_scheduled_10e128bsMSE_Adam_weights.pth'
 model = resnet18(pretrained=False)
@@ -60,6 +63,7 @@ def clip_vid(video_path, model, step=24, val_step=2, im_size=256, allowed_error=
     fps = cap.get(cv2.CAP_PROP_FPS)
     
     clips = []
+    times = []
 
     prev_frame = False
     false_count = 0
@@ -99,6 +103,8 @@ def clip_vid(video_path, model, step=24, val_step=2, im_size=256, allowed_error=
                 # if this is a new clip
                 if not prev_frame:
                     clips.append([])
+                    times.append([get_video_time(i,fps)])
+
                     clip_i += 1
 
                     # update values
@@ -114,12 +120,16 @@ def clip_vid(video_path, model, step=24, val_step=2, im_size=256, allowed_error=
                 false_count += 1
                 if false_count > allowed_error:
                     use_step = step
+
+                    if prev_frame:
+                        times[clip_i].append(get_video_time(i,fps))
+
                     prev_frame = False
 
     
     cap.release()   
                 
-    return clips, fps / val_step
+    return clips, times, fps / val_step
 
 def save_clips(clips, fps, min_clip_length=24):
 
@@ -141,8 +151,19 @@ def save_clips(clips, fps, min_clip_length=24):
 
             out.release()
 
-clips, fps = clip_vid('test2.mp4', model, step=24, val_step=2, im_size=256, allowed_error=48)
-save_clips(clips, fps, min_clip_length=48)
+clips, times, fps = clip_vid('test_clips/test2.mp4', model, step=48, val_step=4, im_size=256, allowed_error=48)
+
+min_length = 96
+save_clips(clips, fps, min_clip_length=min_length)
 
 print(len(clips), 'clips found')
+
+# min_time = dt.datetime.strptime(f'{int((min_length / fps)):02d}', '%S').time()
+
+# show the intervals of time
+for i, t in enumerate(times):
+
+    # only show intervals that were actually saved
+    if len(clips[i]) >= min_length:
+        print(f'clip {i}: {t[0]} - {t[1]}')
 
