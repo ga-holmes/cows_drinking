@@ -8,13 +8,51 @@ import torch
 from torchvision.models import resnet50, resnet18, resnext50_32x4d
 
 import time
+import sys, getopt
+
+FILENAME = None
+
+# set the default values here or in the command line when running the program
+step = 48
+val_step=4
+im_size = 256
+allowed_error = 48
+min_length = 96
+
+# simple function for cmd line args
+def num_or_zero(s:str, default):
+    if s.isdigit():
+        return int(s)
+    else:
+        return default
+
+# get command line arguments
+for i, arg in enumerate(sys.argv):
+    if arg == '-f' and i < len(sys.argv)-1:
+        FILENAME = sys.argv[i+1]
+    elif arg == '-s' and i < len(sys.argv)-1:
+        step = num_or_zero(sys.argv[i+1], step)
+    elif arg == '-sv' and i < len(sys.argv)-1:
+        val_step = num_or_zero(sys.argv[i+1], val_step)
+    elif arg == '-imsize' and i < len(sys.argv)-1:
+        im_size = num_or_zero(sys.argv[i+1], im_size)
+    elif arg == '-e' and i < len(sys.argv)-1:
+        allowed_error = num_or_zero(sys.argv[i+1], allowed_error)
+    elif arg == '-ml' and i < len(sys.argv)-1:
+        min_length = num_or_zero(sys.argv[i+1], min_length)
+
+if FILENAME is None:
+    print('please include \'-f [FILENAME]\'')
+    exit()
+
+# verify args
+print(f'{FILENAME}: step={step}, val_step={val_step}, im_size={im_size}, allowed_error={allowed_error}, min_length={min_length}')
 
 WEIGHT_FILE = 'weights/resnet18_colour_local_scheduled_10e128bsMSE_Adam_weights.pth'
 model = resnet18(pretrained=False)
-LOG_NAME = 'clip_model'
-im_size = 256
-
 num_classes = 2
+LOG_NAME = 'clip_model'
+
 
 # dynamically define whether to run on gpu or cpu
 device_to_use = torch.device("cpu")
@@ -26,31 +64,16 @@ else:
     print("Running on CPU")
 
 
-# loading the model
-
-# Get the number of inputs to the last fully connected layer in the model
-num_ftrs = model.fc.in_features
-# create a new final fully connected layer that we can train to replace the other fully connected layer
-model.fc = nn.Linear(num_ftrs, num_classes)
+def get_args(argv):
+    
+    print(len(argv))
 
 
-# add the model to the device
-model = model.to(device_to_use)
-
-model.load_state_dict(torch.load(WEIGHT_FILE, map_location=device_to_use))
-
-cow_model = Trainer(model, im_size, LOG_NAME, device_to_use=device_to_use)
-
-cow_model.loss_function = nn.MSELoss()
-cow_model.optimizer = optim.Adam(model.fc.parameters(), lr=cow_model.learning_rate)
-
-print(f"Created {LOG_NAME}")
-
-
-model.eval()
-
-
-# parses the given video & 
+# parses the given video &  uses 'model' to create a list of lists of sections of the video 
+# where the BINARY model predicted a true value (1).
+# Moves every 'step' frames for false predictions, & 'val_step' frames for true predictions
+# Adding to a clip is only stopped after 'allowed_error' frames of false predictions
+# this allows the model to be wrong sometimes (no model is 100% accurate)
 def clip_vid(video_path, model, step=24, val_step=2, im_size=256, allowed_error=8):
     
     # save the step value
@@ -131,6 +154,10 @@ def clip_vid(video_path, model, step=24, val_step=2, im_size=256, allowed_error=
                 
     return clips, times, fps / val_step
 
+
+# Given a list if lists containing images in the form of numpy arrays,
+# saves all lists of images as videos above 'min_clip_length' frames in length
+# at 'fps' frames per second
 def save_clips(clips, fps, min_clip_length=24):
 
     # only create a clip if theere are frames
@@ -151,19 +178,46 @@ def save_clips(clips, fps, min_clip_length=24):
 
             out.release()
 
-clips, times, fps = clip_vid('test_clips/test2.mp4', model, step=48, val_step=4, im_size=256, allowed_error=48)
 
-min_length = 96
-save_clips(clips, fps, min_clip_length=min_length)
+# main operations
+if __name__ == "__main__":
 
-print(len(clips), 'clips found')
+    # loading the model
 
-# min_time = dt.datetime.strptime(f'{int((min_length / fps)):02d}', '%S').time()
+    # Get the number of inputs to the last fully connected layer in the model
+    num_ftrs = model.fc.in_features
+    # create a new final fully connected layer that we can train to replace the other fully connected layer
+    model.fc = nn.Linear(num_ftrs, num_classes)
 
-# show the intervals of time
-for i, t in enumerate(times):
 
-    # only show intervals that were actually saved
-    if len(clips[i]) >= min_length:
-        print(f'clip {i}: {t[0]} - {t[1]}')
+    # add the model to the device
+    model = model.to(device_to_use)
 
+    model.load_state_dict(torch.load(WEIGHT_FILE, map_location=device_to_use))
+
+    cow_model = Trainer(model, im_size, LOG_NAME, device_to_use=device_to_use)
+
+    cow_model.loss_function = nn.MSELoss()
+    cow_model.optimizer = optim.Adam(model.fc.parameters(), lr=cow_model.learning_rate)
+
+    print(f"Created {LOG_NAME}")
+
+
+    model.eval()
+
+    # Getting the clips
+    
+    clips, times, fps = clip_vid(FILENAME, model, step=step, val_step=val_step, im_size=im_size, allowed_error=allowed_error)
+
+    save_clips(clips, fps, min_clip_length=min_length)
+
+    print(len(clips), 'clips found')
+
+    # min_time = dt.datetime.strptime(f'{int((min_length / fps)):02d}', '%S').time()
+
+    # show the intervals of time
+    for i, t in enumerate(times):
+
+        # only show intervals that were actually saved
+        if len(clips[i]) >= min_length:
+            print(f'clip {i}: {t[0]} - {t[1]}')
