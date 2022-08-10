@@ -1,8 +1,8 @@
 import cv2
 import matplotlib.pyplot as plt
 
-from trainer import *
-from dataset_functions import get_video_time
+from functions.trainer import *
+from functions.dataset_functions import get_video_time
 
 import torch
 from torchvision.models import resnet50, resnet18, resnext50_32x4d
@@ -11,6 +11,7 @@ import time
 import sys, getopt
 
 FILENAME = None
+output_dir = ''
 
 # set the default values here or in the command line when running the program
 step = 48
@@ -30,6 +31,8 @@ def num_or_zero(s:str, default):
 for i, arg in enumerate(sys.argv):
     if arg == '-f' and i < len(sys.argv)-1:
         FILENAME = sys.argv[i+1]
+    elif arg == '-o' and i < len(sys.argv)-1:
+        output_dir = sys.argv[i+1]
     elif arg == '-s' and i < len(sys.argv)-1:
         step = num_or_zero(sys.argv[i+1], step)
     elif arg == '-sv' and i < len(sys.argv)-1:
@@ -170,7 +173,7 @@ def save_clips(clips, fps, min_clip_length=24):
                 continue
 
             # writing 'clips' to video
-            out = cv2.VideoWriter(f'clips/clip_{i}.avi', cv2.VideoWriter_fourcc(*'DIVX'), fps, (im_size, im_size))
+            out = cv2.VideoWriter(f'{output_dir}/clip_{i}.avi', cv2.VideoWriter_fourcc(*'DIVX'), fps, (im_size, im_size))
 
             # writing to the video
             for f in tqdm(clip):

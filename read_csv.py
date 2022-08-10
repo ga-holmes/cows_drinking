@@ -1,11 +1,19 @@
+
+# 'read_csv.py':
+#     - Reads the data from the given csv files expecting the format presented by the files in /data/ 
+#       (One file for observations (data points), one for video file information)
+#     - Relates the data points to their corresponding videos & outputs a JSON file 
+#       containing the compiled information (all_data.json)
+
+# NOTE: Before using main:
+# Save 'data' & 'recording_codes' pages from excel sheet as individual csv files
+# will output 'all_data.json' that can be used with 'CowsWater' class in model.ipynb
+
+
 from asyncore import read
 from datetime import time
 from csv import reader
 import json
-
-# NOTE: Before using:
-# Save 'data' & 'recording_codes' pages from excel sheet as individual csv files
-# will output 'all_data.json' that can be used with 'CowsWater' class in model.ipynb
 
 data_csv = 'data/data.csv'
 rec_csv = 'data/recording_codes.csv'
@@ -107,7 +115,7 @@ def main():
     # list of data points that have an associated file
     good_data = []
 
-    # associating observations at certain times in certain pens with specifi videos
+    # associating observations at certain times in certain pens with specific videos
     for dp in cows_data:
         for v in rec_codes:
             if dp['DATE'] == v['DATE'] and dp['PEN'] in v['PENS'] and time.fromisoformat(dp['START']) > time.fromisoformat(v['START']) and time.fromisoformat(dp['END']) < time.fromisoformat(v['END']):

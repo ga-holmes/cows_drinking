@@ -1,11 +1,31 @@
+# 'graph.py':
+#     - Creates a visualization of the loss & accuracy over the course of training
+#         - Must provide a filename the bottom of the file
+#         - Make sure the `model_name` variable is the same as the name in the log file
+#     - Arguments: Specify the file name / path to use in the command line when running the program
+#         - graph.py -f [FILENAME/PATH]
+
+import sys
+
 import matplotlib.pyplot as plt
 from matplotlib import style
 style.use('ggplot')
 
-model_name = 'resnet18_colour_local_scheduled_10e128bsMSE_Adam'
+# .log file name/path
+fname = None
+
+# get command line arguments
+# Usage: graph.py -f [FILENAME/PATH]
+for i, arg in enumerate(sys.argv):
+    if arg == '-f' and i < len(sys.argv)-1:
+        fname = sys.argv[i+1]
+
+if fname is None:
+    print('please include \'-f [FILENAME]\'')
+    exit()
 
 # graphs the accuracy and loss of the model
-def create_acc_loss_graph(model_name, file_name):
+def create_acc_loss_graph(file_name):
     # open the file, seperate by newline
     contents = open(file_name, 'r').read().split('\n')
 
@@ -19,7 +39,7 @@ def create_acc_loss_graph(model_name, file_name):
     # iterate through all the lines in the file
     for i, c in enumerate(contents):
         # make sure the line is of the right model name
-        if model_name in c:
+        if len(c.split(',')) > 6:
             # get the values in each line (c) seperated by comma
             name, timestamp, acc, loss, val_acc, val_loss, epoch = c.split(',')
 
@@ -49,4 +69,4 @@ def create_acc_loss_graph(model_name, file_name):
     plt.show()
 
     
-create_acc_loss_graph(model_name, file_name=f'logs/{model_name}.log')
+create_acc_loss_graph(file_name=fname)

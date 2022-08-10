@@ -1,4 +1,9 @@
-from dataset_functions import *
+# 'make_data.py': Sample file using dataset functions
+#     - Given the information in 'all_data.json' & a directory containing the corresponding video files, 
+#       generates a dataset in numpy format & outputs it to a '.npy' file.
+#     - Using default class configuration
+
+from functions.dataset_functions import *
 
 videos_path = 'videos_2'
 

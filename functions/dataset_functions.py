@@ -8,21 +8,14 @@ from tqdm import tqdm
 
 import torch
 
-import time
 import datetime as dt
-
-from torchvision import transforms
 
 import imgaug as ia
 import imgaug.augmenters as iaa
 
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
-from zmq import device
 
-# dataset functions:
+# dataset functions: Contains functions with regards to data management & preprocessing
 
 def get_video_time(frame_num, fps):
     
