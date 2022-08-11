@@ -7,6 +7,9 @@ videos
 videos_2
 clips
 test_clips
+all_data.json
+data.csv
+recording_codes.csv
 !resnet18_weights_alldata.pth
 !resnet18_alldata.log
 !data_example.csv
