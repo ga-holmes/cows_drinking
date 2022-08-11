@@ -21,8 +21,12 @@ Author: Garrett Holmes
 ## Usage:
 ### Files:
 - 'read_csv.py':
-    - Reads the data from the given csv files expecting the format presented by the files in /data/ (One file for observations (data points), one for video file information)
-    - Relates the data points to their corresponding videos & outputs a JSON file containing the compiled information (all_data.json)
+    - Contains funtions that will:
+        - Read the data from the given csv files expecting the format presented by the files in /data/ 
+          (One file for observations (data points), one for video file information)
+          (get_cows_data(), get_rec_codes())
+        - Relate the data points to their corresponding videos is a dictionary (read_csv())
+    - Running this file will output a JSON file containing the compiled information (all_data.json)
 - 'make_data.py':
     - Given the information in 'all_data.json' & a directory containing the corresponding video files, generates a dataset in numpy format & outputs it to a '.npy' file.
     - Using default class configuration

@@ -1,8 +1,11 @@
 
 # 'read_csv.py':
-#     - Reads the data from the given csv files expecting the format presented by the files in /data/ 
-#       (One file for observations (data points), one for video file information)
-#     - Relates the data points to their corresponding videos & outputs a JSON file 
+#     - Contains funtions that will:
+#        - Read the data from the given csv files expecting the format presented by the files in /data/ 
+#          (One file for observations (data points), one for video file information)
+#          (get_cows_data(), get_rec_codes())
+#        - Relate the data points to their corresponding videos is a dictionary (read_csv())
+#     - Running this file will output a JSON file 
 #       containing the compiled information (all_data.json)
 
 # NOTE: Before using main:
@@ -10,13 +13,9 @@
 # will output 'all_data.json' that can be used with 'CowsWater' class in model.ipynb
 
 
-from asyncore import read
 from datetime import time
 from csv import reader
 import json
-
-data_csv = 'data/data.csv'
-rec_csv = 'data/recording_codes.csv'
 
 # get all lines in a given csv except the first (header)
 def read_data(filename=str):
@@ -98,9 +97,10 @@ def get_rec_codes(lines=list):
 
     return videos
 
-# gets the necessary data from the csv files
 
-def main():
+# gets the necessary data from the csv files
+# parameters are the file paths for the respective csv files
+def read_csv(data_csv, rec_csv):
 
     # read the lines from this file
     lines = read_data(data_csv)
@@ -122,9 +122,16 @@ def main():
                 dp['VIDEO'] = v
                 good_data.append(dp)
 
+    return good_data
+
+
+if __name__ == "__main__":
+
+    data_csv = 'data/data.csv'
+    rec_csv = 'data/recording_codes.csv'
+
+    good_data = read_csv(data_csv, rec_csv)
+
     # write the final struct of data associated with videos to a json file to use later
     with open('all_data.json', 'w') as out:
         out.write(json.dumps(good_data, indent=4))
-
-if __name__ == "__main__":
-    main()

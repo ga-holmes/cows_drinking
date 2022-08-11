@@ -17,13 +17,9 @@ import torch
 
 # dataset functions: Contains functions with regards to data management & preprocessing
 
-def get_video_time(frame_num, fps):
-    
-    curr_time =  dt.datetime.strptime(f'{int(((frame_num/fps)/60)/60):02d}:{int(((frame_num/fps)/60)%60):02d}:{int((frame_num / fps)%60):02d}', '%H:%M:%S').time()
-
-    return curr_time
-
-# define a class for the dataset
+# Class for creating a dataset for binary detection of cows based on the format of the 'Cow Water Trough Data'
+# To generate a dataset with a different purpose or format, this class can be used as a guide
+# but this class will not generalize to data outside of exactly the expected format
 class CowsWater():
     # Specify the image size (width & height)
     IMG_SIZE = 512
@@ -34,10 +30,13 @@ class CowsWater():
 
     # directory locations
     VIDEOS = "videos"
-    LABEL_PATH = "all_data.json"
+    LABEL_PATH = None
 
     # define the labels
     LABELS = {"EMPTY": 0, "COW": 1}
+
+    # the data to use
+    data = None
 
     # list we will populate with images
     training_data = []
@@ -46,13 +45,23 @@ class CowsWater():
     empty_count = 0
     cow_count = 0
 
-    def __init__(self, input_path, label_path, grayscale=True, shuffle=True, img_size=512):
+    def __init__(self, input_path, label_path=None, grayscale=True, shuffle=True, img_size=512, load_from_file=False, data=None):
         
         self.VIDEOS = input_path
         self.LABEL_PATH = label_path
         self.GRAYSCALE = grayscale
         self.SHUFFLE = shuffle
         self.IMG_SIZE = img_size
+        self.data = data
+
+        # managing the label data
+        if load_from_file and self.LABEL_PATH is not None:
+            with open(self.LABEL_PATH) as f:
+                self.data = json.load(f)
+
+        if self.data is None:
+            print('Please include a LABEL_PATH or \'data\' parameter.')
+            exit()    
 
     # creates a training data file in the format (list) [(np.array - the image), (a one-hot vector containing the label for the image)]
     # step is how often to save an image from the video (default: every 180 frames)
@@ -61,9 +70,6 @@ class CowsWater():
     def make_training_data(self, step_param=180, valid_step_param=24):
 
         print(f'Grayscale: {self.GRAYSCALE}, Save Name: {self.SAVE_NAME}, Img Size: {self.IMG_SIZE}')
-
-        with open('all_data.json') as f:
-            data = json.load(f)
 
         # so that these can be changed throughout the program
         step = step_param
@@ -80,7 +86,7 @@ class CowsWater():
             
             dir_date = date.replace('-', '/')
             dates = []
-            dates = [dp for dp in data if dp['DATE'] == dir_date]
+            dates = [dp for dp in self.data if dp['DATE'] == dir_date]
 
             print('\n\n'+dir_date)
 
@@ -211,6 +217,12 @@ class CowsWater():
         print("Cows:", self.cow_count)
         print("Empty:", self.empty_count)
 
+
+def get_video_time(frame_num, fps):
+    
+    curr_time =  dt.datetime.strptime(f'{int(((frame_num/fps)/60)/60):02d}:{int(((frame_num/fps)/60)%60):02d}:{int((frame_num / fps)%60):02d}', '%H:%M:%S').time()
+
+    return curr_time
 
 # loads image+label data from 'filename', resizes it to 'im_size', applies 'preprocessing;, 
 # & splits into training & test sets, were the test set is 'validation_percent' the size of the training set, also returns image information dictionary

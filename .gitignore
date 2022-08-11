@@ -2,9 +2,12 @@
 *.npy
 *.log
 *.xlsx
+*.csv
 videos
 videos_2
 clips
 test_clips
 !resnet18_weights_alldata.pth
 !resnet18_alldata.log
+!data_example.csv
+!recording_codes_example.csv
