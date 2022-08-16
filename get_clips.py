@@ -1,3 +1,29 @@
+
+# Python script that will automatically create clips of sections 
+# in a given video where there is an animal in the drinking area.
+# The script takes a file name as input (plus other options) & 
+# saves *N clips from the video in a folder (output directory can also be specified)
+# 
+# Input:
+#   -f: filename/path to file (ex. C:/videos/drinking.mp4
+#   -o: output directory (ex. C:/videos/clips
+#   -wf: file path for trained model weights 
+# 
+# Options: 
+#   -s: step 
+#       (how many frames to skip when no cow present)
+#   -sv: valid step 
+#       (how many frames to skip when a cow is present)
+#   -imsize: what dimension to resize the image to 
+#       (should be the same as the size used for training)
+#   -e: 'Allowed Error' - how many ‘no cow’ predictions to allow before 
+#       stopping saving to the current clip 
+#       (Allows the model to make some incorrect predictions)
+#   -ml: minimum length in frames of a clip that can be saved 
+#       (avoids saving clips that are only a few seconds long)
+
+
+
 import cv2
 import matplotlib.pyplot as plt
 
@@ -12,6 +38,9 @@ import sys, getopt
 
 FILENAME = None
 output_dir = ''
+
+# specify a file path for the model weights here or from cmd args
+WEIGHT_FILE = 'weights/resnet18_colour_local_scheduled_10e128bsMSE_Adam_weights.pth'
 
 # set the default values here or in the command line when running the program
 step = 48
@@ -43,15 +72,17 @@ for i, arg in enumerate(sys.argv):
         allowed_error = num_or_zero(sys.argv[i+1], allowed_error)
     elif arg == '-ml' and i < len(sys.argv)-1:
         min_length = num_or_zero(sys.argv[i+1], min_length)
+    elif arg == '-wf' and i < len(sys.argv)-1:
+        WEIGHT_FILE = sys.argv[i+1]
+
 
 if FILENAME is None:
     print('please include \'-f [FILENAME]\'')
     exit()
 
 # verify args
-print(f'{FILENAME}: step={step}, val_step={val_step}, im_size={im_size}, allowed_error={allowed_error}, min_length={min_length}')
+print(f'{FILENAME}: step={step}, val_step={val_step}, im_size={im_size}, allowed_error={allowed_error}, min_length={min_length}, weights={WEIGHT_FILE}')
 
-WEIGHT_FILE = 'weights/resnet18_colour_local_scheduled_10e128bsMSE_Adam_weights.pth'
 model = resnet18(pretrained=False)
 num_classes = 2
 LOG_NAME = 'clip_model'

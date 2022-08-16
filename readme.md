@@ -48,6 +48,9 @@ Author: Garrett Holmes
     - Creates a visualization of the loss & accuracy over the course of training
         - Must provide a filename the bottom of the file
         - Make sure the `model_name` variable is the same as the name in the log file
+- 'get_clips.py'
+    - Python script that will automatically create clips of sections in a given video where there is an animal in the drinking area.
+    - The script takes a file name as input (plus other options) & saves *N clips from the video in a folder (output directory can also be specified)
 
 ### Using the 'Trainer' Class: 
 - See readme in functions folder

@@ -127,11 +127,11 @@ def read_csv(data_csv, rec_csv):
 
 if __name__ == "__main__":
 
-    data_csv = 'data/data.csv'
-    rec_csv = 'data/recording_codes.csv'
+    data_csv = '../data/data.csv'
+    rec_csv = '../data/recording_codes.csv'
 
     good_data = read_csv(data_csv, rec_csv)
 
     # write the final struct of data associated with videos to a json file to use later
-    with open('all_data.json', 'w') as out:
+    with open('../all_data.json', 'w') as out:
         out.write(json.dumps(good_data, indent=4))
